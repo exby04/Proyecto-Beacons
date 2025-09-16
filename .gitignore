@@ -1,0 +1,26 @@
+# --- Android ---
+android-app/.gradle/
+android-app/.idea/
+android-app/local.properties
+android-app/build/
+android-app/captures/
+*.apk
+
+# --- Arduino ---
+*.hex
+*.elf
+*.bin
+
+# --- Node.js / Server ---
+server/node_modules/
+server/.env
+npm-debug.log
+
+# --- Database ---
+*.db
+*.sqlite
+
+# --- General ---
+.DS_Store
+Thumbs.db
+*.log
