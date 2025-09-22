@@ -92,6 +92,23 @@ public class    MainActivity extends AppCompatActivity {
     private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
 
         BluetoothDevice bluetoothDevice = resultado.getDevice();
+
+        // Si no tiene nombre, lo ignoramos
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        if (bluetoothDevice.getName() == null) {
+            return;
+        }
+
         byte[] bytes = resultado.getScanRecord().getBytes();
         int rssi = resultado.getRssi();
 
