@@ -24,7 +24,7 @@ private:
   // ............................................................
 public:
   EmisoraBLE laEmisora {
-	"Alejandro VAZ BEACON", //  nombre emisora
+	"AVRbeacon", //  nombre emisora
 	  0x004c, // fabricanteID (Apple)
 	  4 // txPower
 	  };

@@ -108,6 +108,9 @@ public class    MainActivity extends AppCompatActivity {
         if (bluetoothDevice.getName() == null) {
             return;
         }
+        if (!bluetoothDevice.getName().equals("AVRbeacon")) {
+            return;
+        }
 
         byte[] bytes = resultado.getScanRecord().getBytes();
         int rssi = resultado.getRssi();
