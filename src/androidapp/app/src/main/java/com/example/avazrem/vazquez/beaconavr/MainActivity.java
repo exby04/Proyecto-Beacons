@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.util.Log;
@@ -51,7 +52,7 @@ public class    MainActivity extends AppCompatActivity {
             @Override
             public void onScanResult( int callbackType, ScanResult resultado ) {
                 super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
+                //Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
 
                 mostrarInformacionDispositivoBTLE( resultado );
             }
@@ -108,6 +109,10 @@ public class    MainActivity extends AppCompatActivity {
         if (bluetoothDevice.getName() == null) {
             return;
         }
+        if (!"AVRbeacon".equals(bluetoothDevice.getName())) {
+            return; // ignorar si no es mi beacon
+        }
+
 
         byte[] bytes = resultado.getScanRecord().getBytes();
         int rssi = resultado.getRssi();
@@ -323,6 +328,7 @@ public class    MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pedirPermisosBLE();
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
 
@@ -331,6 +337,27 @@ public class    MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
     } // onCreate()
+
+    //--------------------------------------------------------------
+    private void pedirPermisosBLE() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            Manifest.permission.BLUETOOTH_SCAN,
+                            Manifest.permission.BLUETOOTH_CONNECT,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    }, CODIGO_PETICION_PERMISOS);
+        } else {
+            // Android <12
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            Manifest.permission.BLUETOOTH,
+                            Manifest.permission.BLUETOOTH_ADMIN,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    }, CODIGO_PETICION_PERMISOS);
+        }
+    }
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
