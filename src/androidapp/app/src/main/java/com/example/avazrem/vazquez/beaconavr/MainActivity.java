@@ -90,17 +90,13 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
-    private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
+    private static final String MI_BEACON_NOMBRE = "GTI"; // nombre esperado
 
+    private void mostrarInformacionDispositivoBTLE(ScanResult resultado) {
         BluetoothDevice bluetoothDevice = resultado.getDevice();
         byte[] bytes = resultado.getScanRecord().getBytes();
-        int rssi = resultado.getRssi();
 
-
-
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        Log.d(ETIQUETA_LOG, " ****** DISPOSITIVO DETECTADO BTLE ****************** ");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
+        // 🔍 FILTRO: solo si es nuestro beacon por nombre
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -111,47 +107,29 @@ public class MainActivity extends AppCompatActivity {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Log.d(ETIQUETA_LOG, " nombre = " + bluetoothDevice.getName());
-        Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
+        String nombre = bluetoothDevice.getName();
+        if (nombre == null || !MI_BEACON_NOMBRE.equals(nombre)) {
+            return; // ignoramos otros beacons
+        }
 
-        /*
-        ParcelUuid[] puuids = bluetoothDevice.getUuids();
-        if ( puuids.length >= 1 ) {
-            //Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].getUuid());
-           // Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].toString());
-        }*/
-
-        Log.d(ETIQUETA_LOG, " dirección = " + bluetoothDevice.getAddress());
-        Log.d(ETIQUETA_LOG, " rssi = " + rssi );
-
-        Log.d(ETIQUETA_LOG, " bytes = " + new String(bytes));
-        Log.d(ETIQUETA_LOG, " bytes (" + bytes.length + ") = " + Utilidades.bytesToHexString(bytes));
-
+        int rssi = resultado.getRssi();
         TramaIBeacon tib = new TramaIBeacon(bytes);
-
-        //Aqui ando usando la clase nueva para interpretar los datos del beacon prueba por ahora
         BeaconMedicion medicion = new BeaconMedicion(tib);
+
+        // 👉 Aquí ya sabes que es tuyo
+        Log.d(ETIQUETA_LOG, "****************************************************");
+        Log.d(ETIQUETA_LOG, "****** BEACON PROPIO DETECTADO *********************");
+        Log.d(ETIQUETA_LOG, "****************************************************");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        Log.d(ETIQUETA_LOG, "nombre = " + nombre);
+        Log.d(ETIQUETA_LOG, "dirección = " + bluetoothDevice.getAddress());
+        Log.d(ETIQUETA_LOG, "rssi = " + rssi);
         Log.d(ETIQUETA_LOG, "Medición interpretada: " + medicion.descripcion());
-        //--------------------------------------------------------------------------
+        Log.d(ETIQUETA_LOG, "****************************************************");
+    }
 
-        Log.d(ETIQUETA_LOG, " ----------------------------------------------------");
-        Log.d(ETIQUETA_LOG, " prefijo  = " + Utilidades.bytesToHexString(tib.getPrefijo()));
-        Log.d(ETIQUETA_LOG, "          advFlags = " + Utilidades.bytesToHexString(tib.getAdvFlags()));
-        Log.d(ETIQUETA_LOG, "          advHeader = " + Utilidades.bytesToHexString(tib.getAdvHeader()));
-        Log.d(ETIQUETA_LOG, "          companyID = " + Utilidades.bytesToHexString(tib.getCompanyID()));
-        Log.d(ETIQUETA_LOG, "          iBeacon type = " + Integer.toHexString(tib.getiBeaconType()));
-        Log.d(ETIQUETA_LOG, "          iBeacon length 0x = " + Integer.toHexString(tib.getiBeaconLength()) + " ( "
-                + tib.getiBeaconLength() + " ) ");
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToHexString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " major  = " + Utilidades.bytesToHexString(tib.getMajor()) + "( "
-                + Utilidades.bytesToInt(tib.getMajor()) + " ) ");
-        Log.d(ETIQUETA_LOG, " minor  = " + Utilidades.bytesToHexString(tib.getMinor()) + "( "
-                + Utilidades.bytesToInt(tib.getMinor()) + " ) ");
-        Log.d(ETIQUETA_LOG, " txPower  = " + Integer.toHexString(tib.getTxPower()) + " ( " + tib.getTxPower() + " )");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-
-    } // ()
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
