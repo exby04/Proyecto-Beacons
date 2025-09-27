@@ -113,8 +113,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         int rssi = resultado.getRssi();
+
+
         TramaIBeacon tib = new TramaIBeacon(bytes);
-        BeaconMedicion medicion = new BeaconMedicion(tib);
+        BeaconMedicion medicion = new BeaconMedicion(
+                tib,
+                bluetoothDevice.getAddress(),
+                resultado.getRssi()
+        );
+        Log.d(ETIQUETA_LOG, "Medición interpretada: " + medicion.descripcion());
 
         // 👉 Aquí ya sabes que es tuyo
         Log.d(ETIQUETA_LOG, "****************************************************");

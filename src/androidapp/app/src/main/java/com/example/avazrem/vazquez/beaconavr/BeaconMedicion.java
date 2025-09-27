@@ -1,32 +1,35 @@
 package com.example.avazrem.vazquez.beaconavr;
 
 public class BeaconMedicion {
-    public static final int SENSOR_CO2 = 11;
-    public static final int SENSOR_TEMP = 12;
+    public static final int SENSOR_CO2   = 11;
+    public static final int SENSOR_TEMP  = 12;
     public static final int SENSOR_RUIDO = 13;
 
+    private final String dispositivoMac;  // Identificador único del Arduino
     private final int sensorId;
     private final int contador;
     private final int valor;
+    private final int rssi;
+    private final long timestamp;
 
-    public BeaconMedicion(TramaIBeacon tib) {
-        int major = Utilidades.bytesToInt(tib.getMajor());
-        this.sensorId = (major >> 8) & 0xFF;  // byte alto
-        this.contador = major & 0xFF;         // byte bajo
-        this.valor = Utilidades.bytesToInt(tib.getMinor());
+    public BeaconMedicion(TramaIBeacon tib, String mac, int rssi) {
+        int major = Utilidades.bytesToInt(tib.getMajor());   // big endian
+        int minor = Utilidades.bytesToInt(tib.getMinor());
+
+        this.sensorId = (major >> 8) & 0xFF;   // byte alto = sensorId
+        this.contador = major & 0xFF;          // byte bajo = contador
+        this.valor = (short) minor;            // soporta negativos
+        this.dispositivoMac = mac;
+        this.rssi = rssi;
+        this.timestamp = System.currentTimeMillis();
     }
 
-    public int getSensorId() {
-        return sensorId;
-    }
-
-    public int getContador() {
-        return contador;
-    }
-
-    public int getValor() {
-        return valor;
-    }
+    public String getDispositivoMac() { return dispositivoMac; }
+    public int getSensorId() { return sensorId; }
+    public int getContador() { return contador; }
+    public int getValor() { return valor; }
+    public int getRssi() { return rssi; }
+    public long getTimestamp() { return timestamp; }
 
     public String descripcion() {
         switch (sensorId) {
