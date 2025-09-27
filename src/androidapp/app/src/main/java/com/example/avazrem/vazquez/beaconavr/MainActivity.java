@@ -52,7 +52,7 @@ public class    MainActivity extends AppCompatActivity {
             @Override
             public void onScanResult( int callbackType, ScanResult resultado ) {
                 super.onScanResult(callbackType, resultado);
-                //Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
+                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
 
                 mostrarInformacionDispositivoBTLE( resultado );
             }
@@ -109,10 +109,11 @@ public class    MainActivity extends AppCompatActivity {
         if (bluetoothDevice.getName() == null) {
             return;
         }
-        if (!"AVRbeacon".equals(bluetoothDevice.getName())) {
+
+        String deviceName = resultado.getScanRecord().getDeviceName();
+        if (deviceName == null || !deviceName.equals("AVRbeacon")) {
             return; // ignorar si no es mi beacon
         }
-
 
         byte[] bytes = resultado.getScanRecord().getBytes();
         int rssi = resultado.getRssi();
