@@ -27,7 +27,7 @@ import java.util.UUID;
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 
-public class    MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -93,30 +93,10 @@ public class    MainActivity extends AppCompatActivity {
     private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
 
         BluetoothDevice bluetoothDevice = resultado.getDevice();
-
-        // Si no tiene nombre, lo ignoramos
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
-        if (bluetoothDevice.getName() == null) {
-            return;
-        }
-
-        String deviceName = resultado.getScanRecord().getDeviceName();
-        if (deviceName == null || !deviceName.equals("AVRbeacon")) {
-            return; // ignorar si no es mi beacon
-        }
-
         byte[] bytes = resultado.getScanRecord().getBytes();
         int rssi = resultado.getRssi();
+
+
 
         Log.d(ETIQUETA_LOG, " ****************************************************");
         Log.d(ETIQUETA_LOG, " ****** DISPOSITIVO DETECTADO BTLE ****************** ");
@@ -148,6 +128,11 @@ public class    MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " bytes (" + bytes.length + ") = " + Utilidades.bytesToHexString(bytes));
 
         TramaIBeacon tib = new TramaIBeacon(bytes);
+
+        //Aqui ando usando la clase nueva para interpretar los datos del beacon prueba por ahora
+        BeaconMedicion medicion = new BeaconMedicion(tib);
+        Log.d(ETIQUETA_LOG, "Medición interpretada: " + medicion.descripcion());
+        //--------------------------------------------------------------------------
 
         Log.d(ETIQUETA_LOG, " ----------------------------------------------------");
         Log.d(ETIQUETA_LOG, " prefijo  = " + Utilidades.bytesToHexString(tib.getPrefijo()));
@@ -206,7 +191,7 @@ public class    MainActivity extends AppCompatActivity {
 
         Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado );
         //Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado
-          //      + " -> " + Utilidades.stringToUUID( dispositivoBuscado ) );
+        //      + " -> " + Utilidades.stringToUUID( dispositivoBuscado ) );
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -329,9 +314,10 @@ public class    MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        pedirPermisosBLE();
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
+
+        pedirPermisos();
 
         inicializarBlueTooth();
 
@@ -339,52 +325,56 @@ public class    MainActivity extends AppCompatActivity {
 
     } // onCreate()
 
-    //--------------------------------------------------------------
-    private void pedirPermisosBLE() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Android 12+
-            ActivityCompat.requestPermissions(this,
-                    new String[]{
-                            Manifest.permission.BLUETOOTH_SCAN,
-                            Manifest.permission.BLUETOOTH_CONNECT,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                    }, CODIGO_PETICION_PERMISOS);
-        } else {
-            // Android <12
-            ActivityCompat.requestPermissions(this,
-                    new String[]{
-                            Manifest.permission.BLUETOOTH,
-                            Manifest.permission.BLUETOOTH_ADMIN,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                    }, CODIGO_PETICION_PERMISOS);
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == CODIGO_PETICION_PERMISOS) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                Log.d(ETIQUETA_LOG, "onRequestPermissionResult(): permisos concedidos ");
+
+                //vuelve a inicializar o arrancar escaneo
+                inicializarBlueTooth();
+
+            } else {
+                Log.d(ETIQUETA_LOG, "onRequestPermissionResult(): permisos NO concedidos ");
+            }
         }
     }
 
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        super.onRequestPermissionsResult( requestCode, permissions, grantResults);
 
-        switch (requestCode) {
-            case CODIGO_PETICION_PERMISOS:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    private void pedirPermisos() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
 
-                    Log.d(ETIQUETA_LOG, " onRequestPermissionResult(): permisos concedidos  !!!!");
-                    // Permission is granted. Continue the action or workflow
-                    // in your app.
-                }  else {
-
-                    Log.d(ETIQUETA_LOG, " onRequestPermissionResult(): Socorro: permisos NO concedidos  !!!!");
-
-                }
-                return;
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{
+                                Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.BLUETOOTH_CONNECT
+                        },
+                        CODIGO_PETICION_PERMISOS
+                );
+            }
+        } else { // Android 11 o menor
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                        },
+                        CODIGO_PETICION_PERMISOS
+                );
+            }
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
-    } // ()
+    }
+
 
 } // class
 // --------------------------------------------------------------
