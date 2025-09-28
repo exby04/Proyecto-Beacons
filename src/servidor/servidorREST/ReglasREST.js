@@ -1,81 +1,104 @@
-// .....................................................................
-// ReglasREST.js
-// .....................................................................
+// servidorREST/ReglasREST.js
+const express = require("express");
 
-module.exports.cargar = function (servidorExpress, laLogica) {
-
-    // .......................................................
-    // GET /prueba
-    // .......................................................
-    servidorExpress.get("/prueba", function (peticion, respuesta) {
-        console.log(" * GET /prueba ");
-        respuesta.send("¡Funciona!");
-    });
+module.exports = function crearReglasREST(logica) {
+    const router = express.Router();
 
     // .......................................................
-    // GET /usuario/:id
+    // POST /guardarMediciones
     // .......................................................
-    servidorExpress.get("/usuario/:id", async function (peticion, respuesta) {
-        console.log(" * GET /usuario/:id ");
-
+    router.post("/guardarMediciones", async (req, res) => {
         try {
-            const id = peticion.params.id;
-            const res = await laLogica.buscarUsuarioPorID(id);
+            const datos = req.body;
 
-            if (!res || res.length !== 1) {
-                respuesta.status(404).send("No encontré usuario con id: " + id);
-                return;
+            if (!datos.mac || !datos.valor) {
+                return res.status(400).json({
+                    ok: false,
+                    error: "Faltan campos requeridos: mac y valor",
+                });
             }
 
-            respuesta.send(JSON.stringify(res[0]));
-        } catch (error) {
-            console.error("Error en GET /usuario/:id:", error);
-            respuesta.status(500).send("Error interno del servidor");
+            // Inserta el dispositivo si no existe y luego la medición
+            await logica.insertarDispositivo(datos.mac, datos.nombre || "GTI");
+            await logica.insertarMedicion(datos);
+
+            res.status(201).json({
+                ok: true,
+                mensaje: "Medición guardada",
+            });
+        } catch (err) {
+            console.error("Error en POST /guardarMediciones:", err);
+            res.status(500).json({
+                ok: false,
+                error: err.message,
+            });
         }
     });
 
     // .......................................................
-    // POST /usuario
+    // GET /recuperarMediciones
     // .......................................................
-    servidorExpress.post("/usuario", async function (peticion, respuesta) {
-        console.log(" * POST /usuario ");
-
+    router.get("/recuperarMediciones", async (req, res) => {
         try {
-            const datos = peticion.body;
-
-            if (!datos.nombre || !datos.edad) {
-                respuesta.status(400).send("Faltan campos requeridos (nombre, edad)");
-                return;
-            }
-
-            await laLogica.insertarUsuario(datos);
-
-            respuesta.status(201).send("Usuario insertado correctamente");
-        } catch (error) {
-            console.error("Error en POST /usuario:", error);
-            respuesta.status(500).send("Error interno del servidor");
+            const filas = await logica.buscarMediciones();
+            res.json({
+                ok: true,
+                datos: filas
+            });
+        } catch (err) {
+            console.error("Error en GET /recuperarMediciones:", err);
+            res.status(500).json({
+                ok: false,
+                error: err.message,
+            });
         }
     });
 
     // .......................................................
-    // DELETE /usuario/:id
+    // GET /recuperarMediciones/:mac
     // .......................................................
-    servidorExpress.delete("/usuario/:id", async function (peticion, respuesta) {
-        console.log(" * DELETE /usuario/:id ");
-
+    router.get("/recuperarMediciones/:mac", async (req, res) => {
         try {
-            const id = peticion.params.id;
-            const borrados = await laLogica.borrarUsuarioPorID(id);
+            const filas = await logica.buscarMedicionesPorMac(req.params.mac);
 
-            if (borrados === 0) {
-                respuesta.status(404).send("No encontré usuario con id: " + id);
-                return;
+            if (!filas || filas.length === 0) {
+                return res.status(404).json({
+                    ok: false,
+                    error: "No se encontraron mediciones para ese dispositivo",
+                });
             }
 
-            respuesta.send("Usuario borrado correctamente");
-        } catch (error) {
-            console.error("Error en DELETE /usuario/:id:", error);
-            respuesta.status(500).send("Error interno del servidor");
+            res.json({
+                ok: true,
+                datos: filas
+            });
+        } catch (err) {
+            console.error("Error en GET /recuperarMediciones/:mac:", err);
+            res.status(500).json({
+                ok: false,
+                error: err.message,
+            });
         }
     });
+
+    // .......................................................
+    // GET /dispositivos
+    // .......................................................
+    router.get("/dispositivos", async (req, res) => {
+        try {
+            const filas = await logica.buscarDispositivos();
+            res.json({
+                ok: true,
+                datos: filas
+            });
+        } catch (err) {
+            console.error("Error en GET /dispositivos:", err);
+            res.status(500).json({
+                ok: false,
+                error: err.message,
+            });
+        }
+    });
+
+    return router;
 };
