@@ -29,13 +29,15 @@ module.exports = class Logica {
     // .....................................................
     // Inserta medición asociada a un dispositivo
     // .....................................................
-    async insertarMedicion({ mac, valor, fecha }) {
-        const fechaSQL = formatearFecha(fecha ? new Date(fecha) : new Date());
-        await this.laConexion.execute(
-            "INSERT INTO Medicion (mac, valor, fecha) VALUES (?, ?, ?)",
-            [mac, valor, fechaSQL]
-        );
-    }
+    async insertarMedicion({ mac, valor, fecha, sensorId, contador, rssi }) {
+    const fechaSQL = formatearFecha(fecha ? new Date(fecha) : new Date());
+    await this.laConexion.execute(
+        `INSERT INTO Medicion (mac, valor, fecha, sensorId, contador, rssi)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [mac, valor, fechaSQL, sensorId, contador, rssi]
+    );
+}
+
 
     // .....................................................
     // Devuelve todas las mediciones

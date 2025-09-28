@@ -8,32 +8,33 @@ module.exports = function crearReglasREST(logica) {
     // POST /guardarMediciones
     // .......................................................
     router.post("/guardarMediciones", async (req, res) => {
-        try {
-            const datos = req.body;
+    try {
+        const datos = req.body;
 
-            if (!datos.mac || !datos.valor) {
-                return res.status(400).json({
-                    ok: false,
-                    error: "Faltan campos requeridos: mac y valor",
-                });
-            }
-
-            // Inserta el dispositivo si no existe y luego la medición
-            await logica.insertarDispositivo(datos.mac, datos.nombre || "GTI");
-            await logica.insertarMedicion(datos);
-
-            res.status(201).json({
-                ok: true,
-                mensaje: "Medición guardada",
-            });
-        } catch (err) {
-            console.error("Error en POST /guardarMediciones:", err);
-            res.status(500).json({
+        if (!datos.mac || typeof datos.valor === "undefined") {
+            return res.status(400).json({
                 ok: false,
-                error: err.message,
+                error: "Faltan campos requeridos: mac y valor",
             });
         }
-    });
+
+        // Inserta dispositivo y luego la medición con más campos
+        await logica.insertarDispositivo(datos.mac, datos.nombre || "GTI");
+        await logica.insertarMedicion(datos);
+
+        res.status(201).json({
+            ok: true,
+            mensaje: "Medición guardada",
+        });
+    } catch (err) {
+        console.error("Error en POST /guardarMediciones:", err);
+        res.status(500).json({
+            ok: false,
+            error: err.message,
+        });
+    }
+});
+
 
     // .......................................................
     // GET /recuperarMediciones
