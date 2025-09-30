@@ -41,6 +41,17 @@ public class BeaconMedicion {
         this.nombre = "GTI"; // el server usa "GTI" por defecto si no llega
     }
 
+    // Constructor alternativo para pruebas
+    public BeaconMedicion(String mac, int sensorId, int contador, int valor, int rssi, long timestamp, String nombre) {
+        this.dispositivoMac = mac;
+        this.sensorId = sensorId;
+        this.contador = contador;
+        this.valor = valor;
+        this.rssi = rssi;
+        this.timestamp = timestamp;
+        this.nombre = nombre;
+    }
+
     public String getDispositivoMac() { return dispositivoMac; }
     public int getSensorId() { return sensorId; }
     public int getContador() { return contador; }

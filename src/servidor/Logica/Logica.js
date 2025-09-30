@@ -2,7 +2,6 @@
 const mysql = require("mysql2/promise");
 
 function formatearFecha(fecha = new Date()) {
-    // Devuelve fecha en formato MySQL DATETIME
     return fecha.toISOString().slice(0, 19).replace("T", " ");
 }
 
