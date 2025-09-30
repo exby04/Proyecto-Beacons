@@ -10,13 +10,16 @@
     <!-- Permisos para Android 12+ (NO usar neverForLocation aquí) -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-
-    <!-- Opcional: si quieres escanear en background -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Permisos para usar la API -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
+    <!-- usesClearTextTraffic es para lo de http no para https tomar en cuenta para plesk futuro -->
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -26,7 +29,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BeaconAVR"
         tools:targetApi="34">
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
