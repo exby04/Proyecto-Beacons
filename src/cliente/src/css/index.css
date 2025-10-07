@@ -1,0 +1,44 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #fafafa;
+}
+
+.topbar {
+  background: #0a4d92;
+  color: white;
+  padding: 1em 0;
+  text-align: center;
+}
+
+.container {
+  width: 90%;
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+}
+
+.table th, .table td {
+  padding: 0.5em;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.table th {
+  background-color: #eaeaea;
+}
+
+.muted {
+  color: #888;
+}
+
+.error {
+  color: red;
+  margin-top: 1em;
+  text-align: center;
+}
