@@ -26,7 +26,7 @@ public class BeaconMedicion {
     private final long timestamp;          // se envía como milisegundos (el server lo convierte)
 
     @SerializedName("nombre")
-    private final String nombre;           // si no lo usas, puedes quitarlo
+    private final String nombre;
 
     public BeaconMedicion(TramaIBeacon tib, String mac, int rssi) {
         int major = Utilidades.bytesToInt(tib.getMajor());   // big endian
@@ -41,24 +41,7 @@ public class BeaconMedicion {
         this.nombre = "GTI"; // el server usa "GTI" por defecto si no llega
     }
 
-    // Constructor alternativo para pruebas
-    public BeaconMedicion(String mac, int sensorId, int contador, int valor, int rssi, long timestamp, String nombre) {
-        this.dispositivoMac = mac;
-        this.sensorId = sensorId;
-        this.contador = contador;
-        this.valor = valor;
-        this.rssi = rssi;
-        this.timestamp = timestamp;
-        this.nombre = nombre;
-    }
-
-    public String getDispositivoMac() { return dispositivoMac; }
-    public int getSensorId() { return sensorId; }
     public int getContador() { return contador; }
-    public int getValor() { return valor; }
-    public int getRssi() { return rssi; }
-    public long getTimestamp() { return timestamp; }
-    public String getNombre() { return nombre; }
 
     public String descripcion() {
         switch (sensorId) {

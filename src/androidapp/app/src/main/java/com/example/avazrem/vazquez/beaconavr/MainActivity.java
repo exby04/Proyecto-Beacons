@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     // Buscar TODOS los dispositivos
     // --------------------------------------------------------------
+    // →
+    //  buscarTodosLosDispositivosBTLE()
+    // →
+    // --------------------------------------------------------------
     private void buscarTodosLosDispositivosBTLE() {
         Log.d(ETIQUETA_LOG, "buscarTodosLosDispositivosBTLE(): empieza");
 
@@ -84,8 +88,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // --------------------------------------------------------------
-// Buscar SOLO nuestro beacon AVRbeacon
-// --------------------------------------------------------------
+    // Buscar SOLO nuestro beacon AVRbeacon
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+    // →
+    //  buscarMisDispositivosBTLE()
+    // →
+    // --------------------------------------------------------------
     private void buscarMisDispositivosBTLE() {
         Log.d(ETIQUETA_LOG, "buscarMisDispositivosBTLE(): empieza");
 
@@ -173,6 +182,11 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     // Detener búsqueda
     // --------------------------------------------------------------
+    // --------------------------------------------------------------
+    // →
+    //  detenerBusquedaDispositivosBTLE()
+    // →
+    // --------------------------------------------------------------
     private void detenerBusquedaDispositivosBTLE() {
         if (this.callbackDelEscaneo == null) return;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) return;
@@ -203,6 +217,11 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // Inicializar Bluetooth y permisos
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+    // →
+    //  inicializarBlueTooth()
+    // →
     // --------------------------------------------------------------
     private void inicializarBlueTooth() {
         Log.d(ETIQUETA_LOG, "inicializarBlueTooth(): obtenemos adaptador BT");

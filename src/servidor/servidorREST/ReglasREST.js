@@ -55,51 +55,5 @@ module.exports = function crearReglasREST(logica) {
         }
     });
 
-    // .......................................................
-    // GET /recuperarMediciones/:mac
-    // .......................................................
-    router.get("/recuperarMediciones/:mac", async (req, res) => {
-        try {
-            const filas = await logica.buscarMedicionesPorMac(req.params.mac);
-
-            if (!filas || filas.length === 0) {
-                return res.status(404).json({
-                    ok: false,
-                    error: "No se encontraron mediciones para ese dispositivo",
-                });
-            }
-
-            res.json({
-                ok: true,
-                datos: filas
-            });
-        } catch (err) {
-            console.error("Error en GET /recuperarMediciones/:mac:", err);
-            res.status(500).json({
-                ok: false,
-                error: err.message,
-            });
-        }
-    });
-
-    // .......................................................
-    // GET /dispositivos
-    // .......................................................
-    router.get("/dispositivos", async (req, res) => {
-        try {
-            const filas = await logica.buscarDispositivos();
-            res.json({
-                ok: true,
-                datos: filas
-            });
-        } catch (err) {
-            console.error("Error en GET /dispositivos:", err);
-            res.status(500).json({
-                ok: false,
-                error: err.message,
-            });
-        }
-    });
-
     return router;
 };

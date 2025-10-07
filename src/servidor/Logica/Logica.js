@@ -49,27 +49,6 @@ module.exports = class Logica {
     }
 
     // .....................................................
-    // Devuelve mediciones de un dispositivo
-    // .....................................................
-    async buscarMedicionesPorMac(mac) {
-        const [rows] = await this.laConexion.execute(
-            "SELECT * FROM Medicion WHERE mac = ? ORDER BY fecha DESC",
-            [mac]
-        );
-        return rows;
-    }
-
-    // .....................................................
-    // Devuelve todos los dispositivos
-    // .....................................................
-    async buscarDispositivos() {
-        const [rows] = await this.laConexion.execute(
-            "SELECT * FROM Dispositivo"
-        );
-        return rows;
-    }
-
-    // .....................................................
     // Cierra la conexión
     // .....................................................
     async cerrar() {
