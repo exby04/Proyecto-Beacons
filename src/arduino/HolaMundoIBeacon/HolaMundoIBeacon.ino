@@ -145,7 +145,7 @@ void loop () {
   
   elPublicador.publicarCO2( valorCO2, // Se publica en el UUID
 							cont,
-							1000 // intervalo de emisión
+							8000 // intervalo de emisión
 							);
   
   // 

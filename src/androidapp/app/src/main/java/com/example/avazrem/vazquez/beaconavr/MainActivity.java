@@ -32,6 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
     private LogicaFake logica;  // objeto que enviará las mediciones al servidor
 
+    // Para evitar duplicados
+    private long ultimaMedicionTimestamp = 0;
+    private int ultimoContador = -1;
+    private static final long INTERVALO_ENVIO_MS = 5000; // 5 segundos mínimo entre envíos
+
 
     // --------------------------------------------------------------
     // Buscar TODOS los dispositivos
@@ -79,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // --------------------------------------------------------------
-    // Buscar SOLO nuestro beacon AVRbeacon
-    // --------------------------------------------------------------
+// Buscar SOLO nuestro beacon AVRbeacon
+// --------------------------------------------------------------
     private void buscarMisDispositivosBTLE() {
         Log.d(ETIQUETA_LOG, "buscarMisDispositivosBTLE(): empieza");
 
@@ -91,13 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
                 BluetoothDevice bluetoothDevice = resultado.getDevice();
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
                 String nombre = bluetoothDevice.getName();
@@ -120,6 +118,18 @@ public class MainActivity extends AppCompatActivity {
                         rssi
                 );
 
+                // FILTRO ANTIDUPLICADOS
+                long ahora = System.currentTimeMillis();
+                if (medicion.getContador() == ultimoContador &&
+                        (ahora - ultimaMedicionTimestamp) < INTERVALO_ENVIO_MS) {
+                    //Log.d(ETIQUETA_LOG, "Medición duplicada ignorada (contador=" + medicion.getContador() + ")");
+                    return; // salimos sin enviar
+                }
+                //Si es nueva, actualiza la referencia
+                ultimoContador = medicion.getContador();
+                ultimaMedicionTimestamp = ahora;
+                // -------------------------------------------------------------
+
                 Log.d(ETIQUETA_LOG, "****************************************************");
                 Log.d(ETIQUETA_LOG, "****** BEACON PROPIO DETECTADO *********************");
                 Log.d(ETIQUETA_LOG, "****************************************************");
@@ -127,10 +137,13 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(ETIQUETA_LOG, "dirección = " + bluetoothDevice.getAddress());
                 Log.d(ETIQUETA_LOG, "rssi = " + rssi);
                 Log.d(ETIQUETA_LOG, "Medición interpretada: " + medicion.descripcion());
-                //Enviar la medición al servidor
+
+                // 🚀 Enviar la medición al servidor
                 if (logica != null) {
                     logica.guardarMedicion(medicion);
+                    Log.d(ETIQUETA_LOG, "📡 Medición enviada a la API");
                 }
+
                 Log.d(ETIQUETA_LOG, "****************************************************");
             }
 
@@ -155,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         elEscanner.startScan(Collections.singletonList(filtro), settings, this.callbackDelEscaneo);
         Log.d(ETIQUETA_LOG, "buscarMisDispositivosBTLE(): escaneo iniciado SOLO para " + MI_BEACON_NOMBRE);
     }
+
 
     // --------------------------------------------------------------
     // Detener búsqueda
