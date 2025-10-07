@@ -30,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothLeScanner elEscanner;
     private ScanCallback callbackDelEscaneo = null;
 
+    private LogicaFake logica;  // objeto que enviará las mediciones al servidor
+
+
     // --------------------------------------------------------------
     // Buscar TODOS los dispositivos
     // --------------------------------------------------------------
@@ -124,6 +127,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(ETIQUETA_LOG, "dirección = " + bluetoothDevice.getAddress());
                 Log.d(ETIQUETA_LOG, "rssi = " + rssi);
                 Log.d(ETIQUETA_LOG, "Medición interpretada: " + medicion.descripcion());
+                //Enviar la medición al servidor
+                if (logica != null) {
+                    logica.guardarMedicion(medicion);
+                }
                 Log.d(ETIQUETA_LOG, "****************************************************");
             }
 
@@ -232,6 +239,8 @@ public class MainActivity extends AppCompatActivity {
 
         pedirPermisos();
         inicializarBlueTooth();
+
+        logica = new LogicaFake("http://192.168.84.97:8080/api/"); //inicializa conexión con la API
 
         Log.d(ETIQUETA_LOG, "onCreate(): termina");
     }
