@@ -1,5 +1,4 @@
 // -*- mode: c++ -*-
-
 // --------------------------------------------------------------
 // Jordi Bataller i Mascarell
 // --------------------------------------------------------------
@@ -16,20 +15,20 @@ class Publicador {
 private:
 
   uint8_t beaconUUID[16] = { 
-	'E', 'P', 'S', 'G', '-', 'G', 'T', 'I', 
-	'-', 'P', 'R', 'O', 'Y', '-', '3', 'A'
+	'U', 'U', 'I', 'D', '-', 'F', 'I', 'J', 
+	'O', '-', '-', '-', 'A', 'L', 'A', 'N'
 	};
 
   // ............................................................
   // ............................................................
 public:
   EmisoraBLE laEmisora {
-	"GTI", //  nombre emisora
-	  0x004c, // fabricanteID (Apple)
-	  4 // txPower
+	"AVRbeacon", //  nombre emisora
+	  0x004c, // fabricanteID (Apple) OBLIGATORIO
+	  4 // txPower: Es “+4 dBm”, la potencia máxima de transmisión (real - antena).
 	  };
-  
-  const int RSSI = -53; // por poner algo, de momento no lo uso
+
+  const int RSSI = -53; // por poner algo, de momento no lo uso. ES INVENTADO, HABRÍA QUE CALCULARLO REALMENTE.
 
   // ............................................................
   // ............................................................
@@ -46,8 +45,6 @@ public:
   // ............................................................
   // ............................................................
   Publicador( ) {
-	// ATENCION: no hacerlo aquí. (*this).laEmisora.encenderEmisora();
-	// Pondremos un método para llamarlo desde el setup() más tarde
   } // ()
 
   // ............................................................
@@ -64,7 +61,8 @@ public:
 	//
 	// 1. empezamos anuncio
 	//
-	uint16_t major = (MedicionesID::CO2 << 8) + contador;
+	uint16_t major = (MedicionesID::CO2 << 8) + contador; // Si estás publicando CO₂ y contador = 7;  major = 0B07 (CO₂ + contador; major = 0x0B07
+
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
 											valorCO2, // minor

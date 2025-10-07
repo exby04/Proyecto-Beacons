@@ -6,10 +6,12 @@
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
 // 2019-07-07
+// LED.h:eEste fichero define la clase LED, que encapsula el control de un diodo LED conectado a una placa Arduino (o similar).
 // ----------------------------------------------------------
 
 // ----------------------------------------------------------
 // ----------------------------------------------------------
+// esperar(...) no es algo propio solo de un LED, sino una utilidad general.
 void esperar (long tiempo) {
   delay (tiempo);
 }
