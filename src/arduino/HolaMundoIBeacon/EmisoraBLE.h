@@ -3,7 +3,9 @@
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
 // 2019-07-07
+// EmisoraBLE.h: encapsula toda la lógica de configuración, arranque, anuncio y gestión de servicios/callbacks de una emisora Bluetooth Low Energy (BLE).
 // ----------------------------------------------------------
+// Sirve para que el fichero de cabecera Emisora.h no se incluya más de una vez al compilar
 #ifndef EMISORA_H_INCLUIDO
 #define EMISORA_H_INCLUIDO
 
@@ -32,7 +34,9 @@ private:
 public:
 
   // .........................................................
-  // .........................................................
+  // Definimos tipos de funciones callback para eventos BLE:
+  // - CallbackConexionEstablecida: se llama al conectar un dispositivo (recibe el handle de conexión).
+  // - CallbackConexionTerminada: se llama al desconectar un dispositivo (recibe el handle y el motivo).
   using CallbackConexionEstablecida = void ( uint16_t connHandle );
   using CallbackConexionTerminada = void ( uint16_t connHandle, uint8_t reason);
 
@@ -76,7 +80,7 @@ public:
 	// Serial.println ( "Bluefruit.begin() " );
 	 Bluefruit.begin(); 
 
-	 // por si acaso:
+	 // se llama “por si acaso” para asegurar que no hay anuncios activos antes
 	 (*this).detenerAnuncio();
   } // ()
 
@@ -104,7 +108,7 @@ public:
   }  // ()
   
   // .........................................................
-  // estaAnunciando() -> Boleano
+  // estaAnunciando() -> T/F
   // .........................................................
   bool estaAnunciando() {
 	return Bluefruit.Advertising.isRunning();
@@ -119,6 +123,11 @@ public:
 	//
 	(*this).detenerAnuncio();
 	
+  //Líneas a añadir (Tributos a Fédor, sin esto no limpia bufffers y solo envía el primer anuncio del primer loop y ya. DOLOR DE CABEZA.)
+		Bluefruit.Advertising.stop();
+    Bluefruit.Advertising.clearData();
+    Bluefruit.ScanResponse.clearData();
+
 	//
 	// creo el beacon 
 	//
@@ -200,17 +209,20 @@ public:
 
 	const uint8_t tamanyoCarga = strlen( carga );
   */
+
+  // Permite mandar cualquier carga de 21 bytes en lugar de los típicos UUID+Major+Minor+TxPower
   void emitirAnuncioIBeaconLibre( const char * carga, const uint8_t tamanyoCarga ) {
 
 	(*this).detenerAnuncio(); 
 
-	Bluefruit.Advertising.clearData();
-	Bluefruit.ScanResponse.clearData(); // hace falta?
+	Bluefruit.Advertising.clearData(); // Borra todos los datos que se iban a mandar en el paquete de Advertising.
+	Bluefruit.ScanResponse.clearData(); // hace falta? Borra los datos del Scan Response, que es un segundo paquete opcional
 
 	// Bluefruit.setTxPower( (*this).txPower ); creo que no lo pongo porque es uno de los bytes de la parte de carga que utilizo
 	Bluefruit.setName( (*this).nombreEmisora );
 	Bluefruit.ScanResponse.addName();
 
+// Dispositivo BLE solo
 	Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
 
 	// con este parece que no va  !
@@ -220,6 +232,8 @@ public:
 	// hasta ahora habrá, supongo, ya puestos los 5 primeros bytes. Efectivamente.
 	// Falta poner 4 bytes fijos (company ID, beacon type, longitud) y 21 de carga
 	//
+
+  // Preparar cabecera + carga
 	uint8_t restoPrefijoYCarga[4+21] = {
 	  0x4c, 0x00, // companyID 2
 	  0x02, // ibeacon type 1byte
@@ -236,6 +250,8 @@ public:
 	// addData() hay que usarlo sólo una vez. Por eso copio la carga
 	// en el anterior array, donde he dejado 21 sitios libres
 	//
+
+  // limita la copia a un máximo de 21 bytes
 	memcpy( &restoPrefijoYCarga[4], &carga[0], ( tamanyoCarga > 21 ? 21 : tamanyoCarga ) ); 
 
 	//
@@ -248,10 +264,10 @@ public:
 	//
 	// ? qué valores poner aquí ?
 	//
-	Bluefruit.Advertising.restartOnDisconnect(true);
-	Bluefruit.Advertising.setInterval(100, 100);    // in unit of 0.625 ms
+	Bluefruit.Advertising.restartOnDisconnect(true); 
+	Bluefruit.Advertising.setInterval(100, 100);    // in unit of 0.625 ms, velocidad de anuncio
 
-	Bluefruit.Advertising.setFastTimeout( 1 );      // number of seconds in fast mode
+	Bluefruit.Advertising.setFastTimeout( 1 );      // number of seconds in fast mode, tiempo rápido
 	//
 	// empieza el anuncio, 0 = tiempo indefinido (ya lo pararán)
 	//
@@ -281,6 +297,7 @@ public:
   
   // .........................................................
   // .........................................................
+  // Esta simplemente añade el servicio BLE sin características extra.
   bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio ) { 
 	return (*this).anyadirServicio( servicio );
   } // 
@@ -337,4 +354,3 @@ public:
 // ----------------------------------------------------------
 // ----------------------------------------------------------
 // ----------------------------------------------------------
-

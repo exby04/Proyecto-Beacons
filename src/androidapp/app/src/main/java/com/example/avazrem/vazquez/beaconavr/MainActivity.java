@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScanResult( int callbackType, ScanResult resultado ) {
                 super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
+                //Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
 
                 mostrarInformacionDispositivoBTLE( resultado );
             }
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
-    private static final String MI_BEACON_NOMBRE = "GTI"; // nombre esperado
+    private static final String MI_BEACON_NOMBRE = "AVRbeacon"; // nombre esperado
 
     private void mostrarInformacionDispositivoBTLE(ScanResult resultado) {
         BluetoothDevice bluetoothDevice = resultado.getDevice();
@@ -308,20 +308,20 @@ public class MainActivity extends AppCompatActivity {
 
         inicializarBlueTooth();
 
-        logica = new LogicaFake("http://192.168.x.x:8080/api/");
+        //logica = new LogicaFake("http://192.168.x.x:8080/api/");
 
         //PRUEBA: mandar una medición fake al servidor
-        BeaconMedicion medicionFake = new BeaconMedicion(
-                "AA:BB:CC:DD:EE:FF",  // mac fake
-                12,                   // sensorId (ej: temperatura)
-                1,                    // contador
-                42,                   // valor (ej: 42 °C)
-                -55,                  // rssi
-                System.currentTimeMillis(),
-                "SensorTest"
-        );
+        //BeaconMedicion medicionFake = new BeaconMedicion(
+        //        "AA:BB:CC:DD:EE:FF",  // mac fake
+        //        12,                   // sensorId (ej: temperatura)
+        //        1,                    // contador
+        //        42,                   // valor (ej: 42 °C)
+        //        -55,                  // rssi
+        //        System.currentTimeMillis(),
+        //        "SensorTest"
+        //);
 
-        logica.guardarMedicion(medicionFake);
+        //logica.guardarMedicion(medicionFake);
 
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
