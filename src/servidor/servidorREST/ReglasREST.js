@@ -34,7 +34,7 @@ module.exports = function crearReglasREST(logica) {
         mensaje: "Medición guardada correctamente",
       });
     } catch (err) {
-      console.error("❌ Error en POST /guardarMediciones:", err);
+      console.error("Error en POST /guardarMediciones:", err);
       res.status(500).json({
         ok: false,
         error: err.message,
@@ -53,7 +53,7 @@ module.exports = function crearReglasREST(logica) {
         datos: filas,
       });
     } catch (err) {
-      console.error("❌ Error en GET /recuperarMediciones:", err);
+      console.error("Error en GET /recuperarMediciones:", err);
       res.status(500).json({
         ok: false,
         error: err.message,

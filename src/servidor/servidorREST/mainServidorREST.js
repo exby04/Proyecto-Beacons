@@ -27,7 +27,7 @@ async function main() {
 
     // Crear servidor Express
     const app = express();
-    app.use(cors()); // 👈 permite peticiones desde tu frontend
+    app.use(cors()); 
     app.use(express.json());
 
     // Reglas REST
