@@ -2,7 +2,8 @@ package com.example.avazrem.vazquez.beaconavr;
 
 import android.util.Log;
 
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,9 +15,13 @@ public class LogicaFake {
     private final ApiService api;
 
     public LogicaFake(String baseUrl) {
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl) // ej: "http://10.0.2.2:8080/api/"
-                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(baseUrl) // ej: "http://192.168.84.97:8080/api/"
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         api = retrofit.create(ApiService.class);
@@ -24,6 +29,9 @@ public class LogicaFake {
 
     // POST -> enviar medición
     public void guardarMedicion(BeaconMedicion medicion) {
+        Gson gsonDebug = new GsonBuilder().setPrettyPrinting().create();
+        Log.d("LogicaFake", "📤 JSON ENVIADO:\n" + gsonDebug.toJson(medicion));
+
         api.guardarMedicion(medicion).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -40,6 +48,5 @@ public class LogicaFake {
             }
         });
     }
-
 
 }

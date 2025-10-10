@@ -105,6 +105,18 @@ public class TramaIBeacon {
         iBeaconLength = prefijo[ 8 ]; // 1 byte
 
     } // ()
+
+    // -------------------------------------------------------------------------------
+    // Convierte el UUID (16 bytes) a un String en formato estándar
+    // -------------------------------------------------------------------------------
+    public String getUUIDComoString() {
+        try {
+            return new String(uuid, "UTF-8").trim();
+        } catch (Exception e) {
+            return "UUID_DESCONOCIDO";
+        }
+    }
+
 } // class
 // -----------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------

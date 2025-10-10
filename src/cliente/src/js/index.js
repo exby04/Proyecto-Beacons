@@ -1,19 +1,24 @@
 // js/index.js
 
-const API_URL = "http://192.168.84.97:8080/api/recuperarMediciones"; 
+const API_URL = "http://localhost:8080/api/recuperarMediciones";
 const tablaBody = document.getElementById("tbody-medidas");
 const limitSelect = document.getElementById("limit");
 const errorMsg = document.getElementById("error");
 
 async function cargarMedidas() {
   const limite = limitSelect.value;
+
   try {
     const resp = await fetch(`${API_URL}?limit=${limite}`);
     if (!resp.ok) throw new Error(`Error HTTP: ${resp.status}`);
-    const datos = await resp.json();
+    const json = await resp.json();
 
-    mostrarMedidas(datos);
+    console.log("Respuesta API:", json); // 👈 importante para ver en consola
+
+    const medidas = json.datos || []; // 👈 tu array está dentro de "datos"
+    mostrarMedidas(medidas);
     errorMsg.hidden = true;
+
   } catch (error) {
     console.error("Error al cargar medidas:", error);
     errorMsg.textContent = "Error al conectar con el servidor o cargar datos.";
@@ -29,22 +34,30 @@ function mostrarMedidas(medidas) {
   }
 
   for (const m of medidas) {
+    const fecha = new Date(m.fecha);
     const fila = `
       <tr>
         <td>${m.id}</td>
-        <td>${m.uuid}</td>
-        <td>${m.sensor}</td>
+        <td>${m.mac || "-"}</td>
+        <td>${traducirSensor(m.sensorId)}</td>
         <td>${m.valor}</td>
         <td>${m.contador}</td>
-        <td>${new Date(m.timestamp).toLocaleDateString()}</td>
-        <td>${new Date(m.timestamp).toLocaleTimeString()}</td>
+        <td>${fecha.toLocaleDateString()}</td>
+        <td>${fecha.toLocaleTimeString()}</td>
       </tr>`;
     tablaBody.insertAdjacentHTML("beforeend", fila);
   }
 }
 
-limitSelect.addEventListener("change", cargarMedidas);
+function traducirSensor(id) {
+  switch (id) {
+    case 11: return "CO₂";
+    case 12: return "Temperatura";
+    case 13: return "Ruido";
+    default: return id;
+  }
+}
 
-// refrescar cada 5 segundos
+limitSelect.addEventListener("change", cargarMedidas);
 setInterval(cargarMedidas, 5000);
 cargarMedidas();

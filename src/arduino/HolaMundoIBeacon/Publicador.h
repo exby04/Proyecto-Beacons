@@ -15,20 +15,20 @@ class Publicador {
 private:
 
   uint8_t beaconUUID[16] = { 
-	'U', 'U', 'I', 'D', '-', 'F', 'I', 'J', 
-	'O', '-', '-', '-', 'A', 'L', 'A', 'N'
+	'E', 'P', 'S', 'G', '-', 'U', 'U', 'I', 
+	'D', '-', 'D', 'E', '-', 'A', 'V', 'R'
 	};
 
   // ............................................................
   // ............................................................
 public:
   EmisoraBLE laEmisora {
-	"AVRbeacon", //  nombre emisora
-	  0x004c, // fabricanteID (Apple) OBLIGATORIO
-	  4 // txPower: Es “+4 dBm”, la potencia máxima de transmisión (real - antena).
+	"AVRbeacon", //emisora
+	  0x004c, 
+	  4 
 	  };
 
-  const int RSSI = -53; // por poner algo, de momento no lo uso. ES INVENTADO, HABRÍA QUE CALCULARLO REALMENTE.
+  const int RSSI = -50; 
 
   // ............................................................
   // ............................................................

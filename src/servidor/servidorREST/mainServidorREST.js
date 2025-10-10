@@ -1,50 +1,52 @@
 // servidorREST/mainServidorREST.js
 const express = require("express");
-const Logica = require("../Logica/Logica.js");   
+const cors = require("cors"); 
+const Logica = require("../Logica/Logica.js");
 const crearReglasREST = require("./ReglasREST.js");
 
 async function main() {
-    try {
-        // Configuración de MySQL
-        const laLogica = await new Promise((resolver, rechazar) => {
-            const laLogica = new Logica(
-                {
-                    // Configuración de XAMPP
-                    host: "localhost",
-                    user: "root",
-                    password: "",
-                    database: "beacons"
-                },
-                (err) => {
-                    if (err) {
-                        rechazar(err);
-                    } else {
-                        resolver(laLogica);
-                    }
-                }
-            );
-        });
+  try {
+    // Conexión a MySQL en Plesk
+    const laLogica = await new Promise((resolver, rechazar) => {
+      const laLogica = new Logica(
+        {
+          host: "localhost",          
+          user: "root",            
+          password: "", 
+          database: "beacons"         
+        },
+        (err) => {
+          if (err) {
+            rechazar(err);
+          } else {
+            resolver(laLogica);
+          }
+        }
+      );
+    });
 
-        // Creo servidor Express
-        const app = express();
-        app.use(express.json());
+    // Crear servidor Express
+    const app = express();
+    app.use(cors()); // 👈 permite peticiones desde tu frontend
+    app.use(express.json());
 
-        // Cargo reglas REST
-        app.use("/api", crearReglasREST(laLogica));
+    // Reglas REST
+    app.use("/api", crearReglasREST(laLogica));
 
-        // Arranco el servidor
-        const servicio = app.listen(8080, () => {
-            console.log("Servidor REST en http://localhost:8080/api");
-        });
+    // Iniciar servidor
+    const puerto = process.env.PORT || 8080;
+    const servicio = app.listen(puerto, () => {
+      console.log(`Servidor REST en puerto ${puerto}`);
+    });
 
-        // Capturo Ctrl+C
-        process.on("SIGINT", function () {
-            console.log("Terminando servidor...");
-            servicio.close();
-        });
-    } catch (err) {
-        console.error("Error al iniciar servidor:", err);
-    }
+    // Capturar Ctrl+C
+    process.on("SIGINT", function () {
+      console.log("Terminando servidor...");
+      servicio.close();
+    });
+  } catch (err) {
+    console.error("Error al iniciar servidor:", err);
+  }
 }
 
 main();

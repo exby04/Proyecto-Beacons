@@ -1,6 +1,7 @@
 // logica/Logica.js
 const mysql = require("mysql2/promise");
 
+// Formatea una fecha JS a formato SQL (YYYY-MM-DD HH:MM:SS)
 function formatearFecha(fecha = new Date()) {
     return fecha.toISOString().slice(0, 19).replace("T", " ");
 }
@@ -16,30 +17,19 @@ module.exports = class Logica {
     }
 
     // .....................................................
-    // Inserta dispositivo (solo si no existe)
+    // Inserta medición asociada a un dispositivo (con UUID)
     // .....................................................
-    async insertarDispositivo(mac, nombre) {
+    async insertarMedicion({ mac, uuid, valor, fecha, sensorId, rssi }) {
+        const fechaSQL = formatearFecha(fecha ? new Date(fecha) : new Date());
         await this.laConexion.execute(
-            "INSERT IGNORE INTO Dispositivo (mac, nombre) VALUES (?, ?)",
-            [mac, nombre]
+            `INSERT INTO Medicion (mac, uuid, valor, fecha, sensorId, rssi)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [mac, uuid, valor, fechaSQL, sensorId, rssi]
         );
     }
 
     // .....................................................
-    // Inserta medición asociada a un dispositivo
-    // .....................................................
-    async insertarMedicion({ mac, valor, fecha, sensorId, contador, rssi }) {
-    const fechaSQL = formatearFecha(fecha ? new Date(fecha) : new Date());
-    await this.laConexion.execute(
-        `INSERT INTO Medicion (mac, valor, fecha, sensorId, contador, rssi)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [mac, valor, fechaSQL, sensorId, contador, rssi]
-    );
-}
-
-
-    // .....................................................
-    // Devuelve todas las mediciones
+    // Devuelve todas las mediciones (ordenadas por fecha)
     // .....................................................
     async buscarMediciones() {
         const [rows] = await this.laConexion.execute(
@@ -49,7 +39,7 @@ module.exports = class Logica {
     }
 
     // .....................................................
-    // Cierra la conexión
+    // Cierra la conexión con la BD
     // .....................................................
     async cerrar() {
         await this.laConexion.end();
