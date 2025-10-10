@@ -35,7 +35,7 @@ API REST encargada de recibir, validar y almacenar las mediciones en MySQL.
 
 **Endpoints principales:**
 - `GET /api/recuperarMediciones?limit=n` → Recupera las últimas *n* mediciones.  
-- `POST /api/medida` → Inserta una nueva medición.
+- `POST /api/guardarMediciones` → Inserta una nueva medición.
 
 ---
 
