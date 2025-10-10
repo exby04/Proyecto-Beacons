@@ -12,33 +12,55 @@ body {
 }
 
 .container {
-  width: 90%;
+  width: 95%;
   margin: 0 auto;
-  max-width: 900px;
+  max-width: 1100px;
+  overflow-x: auto; /* 👈 permite scroll si la tabla es más ancha */
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1em;
+  min-width: 800px; /* 👈 asegura buena proporción de columnas */
 }
 
-.table th, .table td {
-  padding: 0.5em;
+.table th,
+.table td {
+  padding: 0.6em 0.5em;
   border-bottom: 1px solid #ddd;
   text-align: center;
+  word-break: break-word; /* 👈 evita que el uuid desborde */
 }
 
 .table th {
   background-color: #eaeaea;
+  white-space: nowrap;
 }
+
+.table td:nth-child(2) { width: 140px; } /* MAC */
+.table td:nth-child(3) { width: 140px; } /* Sensor */
+.table td:nth-child(4) { width: 100px; } /* Valor */
+.table td:nth-child(5),
+.table td:nth-child(6) { width: 120px; } /* Fecha y Hora */
+.table td:nth-child(7) { width: 220px; font-size: 0.9em; } /* UUID */
 
 .muted {
   color: #888;
+  text-align: center;
 }
 
 .error {
   color: red;
   margin-top: 1em;
   text-align: center;
+}
+
+/* 👇 mejora visual de filas */
+.table tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.table tr:hover {
+  background: #e6f0ff;
 }
