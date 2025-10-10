@@ -72,6 +72,9 @@ API REST encargada de recibir, validar y almacenar las mediciones en MySQL.
 2. Inicia el servidor
   node mainServidorREST.js
 
+### 4. TEST (Node.js)
+ir a la carpeta test dentro de servidor y hacer node test_mediciones.js
+
 Diagramas y Diseño
 Clases C++: LED, EmisoraBLE, Publicador, Medidor.
 Diagrama BLE: Flujo de datos entre emisor y receptor.
