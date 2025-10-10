@@ -73,7 +73,7 @@ API REST encargada de recibir, validar y almacenar las mediciones en MySQL.
   node mainServidorREST.js
 
 ### 4. TEST (Node.js)
-ir a la carpeta test dentro de servidor y hacer node test_mediciones.js
+En la consola ir a la carpeta test dentro de servidor y en el prompt -> npx mocha test_mediciones.js --timeout 5000
 
 Diagramas y Diseño
 Clases C++: LED, EmisoraBLE, Publicador, Medidor.
